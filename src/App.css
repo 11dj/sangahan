@@ -1,0 +1,140 @@
+@media screen and (min-width: 992px) {
+  .App {
+    width: 720px;
+    margin: auto;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .App {
+    width: 100%;
+  }
+}
+
+.title-style {
+  text-align: center;
+  font-size: 3em;
+  margin: 20px;
+  /* background-color: #B9E4C9; */
+  padding: 20px 10px;
+}
+
+.section1 {
+  font-size: 24px;
+  margin: 20px;
+  background-color: #EEF3D7;
+  padding: 20px 0px;
+}
+
+.header1 {
+  margin-bottom: 10px;
+  text-align: center;
+}
+.h-line {
+  border-bottom: 1px red solid;
+  margin: 0px 20px;
+}
+.v-line {
+  border-left: 1px red solid;
+}
+
+.menu-name-input {
+  font-size: 20px;
+  background: transparent;
+  border: none;
+  background-color: #FFFBE6;
+  padding: 10px;
+  color: #37966F;
+  width: 100%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+.menu-name-input::placeholder {
+  color: #B9E4C9;
+}
+
+.input-div, .list-div {
+  margin: 20px;
+}
+
+.button-div {
+  text-align: center;
+  width: 100%;
+}
+
+.button-style {
+  background: #37966F;
+  border: none;
+  font-size: 22px;
+  padding: 8px 16px;
+  color: white;
+}
+
+.list-div {
+  font-size: 18px;
+}
+
+.row-list {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0px;
+  background: #B9E4C9;
+  padding-left: 4px;
+  padding: 10px;
+}
+
+.list-btn-div {
+  display: flex;
+  background: red;
+  justify-content: center;
+  margin: 10px 0px;
+}
+
+.list-detail {
+  width: 100%;
+  font-size: 16px;
+  margin-left: 20px;
+  /* color: gray; */
+  background-color: #37966F;
+}
+
+.copy-btn {
+  /* background: #37966F; */
+  border: none;
+  /* color: white; */
+  padding: 0px 8px;
+}
+
+footer {
+  background: #B9E4C9;
+  padding: 10px 10px;
+  color: #37966F;
+  text-align: center;
+}
+
+.list-detail2 {
+  width: 200px;
+  font-size: 16px;
+  margin-left: 20px;
+  /* color: gray; */
+  background-color: #37966F;
+  display: flex;
+}
+
+.list-title-div {
+  flex: 2;
+  background: yellow;
+  /* padding: 2px 4px; */
+  margin: 4px;
+}
+
+.list-name-div {
+  flex: 4;
+  padding: 2px 4px;
+  margin: 4px 4px;
+  /* width: 100%; */
+  background: cyan;
+  justify-content: space-between;
+}
