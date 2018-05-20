@@ -1,14 +1,14 @@
 .App {
   height: 100%;
 }
-@media screen and (min-width: 992px) {
+@media screen and (min-width: 720px) {
   .App {
     width: 720px;
     margin: auto;
   }
 }
 
-@media screen and (max-width: 992px) {
+@media screen and (max-width: 720px) {
   .App {
     width: 100%;
   }

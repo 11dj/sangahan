@@ -14,15 +14,26 @@ class App extends Component {
     this.state = {
       foodName: '',
       byName: '',
-      test1 : [],
-      test2: '',
-      items: {},
+      items: {}
     }
   }
 
-  componentDidMount () {
+  componentDidUpdate () {
+    // firebase.database().ref('foods').on('value', snapshot => {
+    //   // console.log(snapshot.val())
+    //   if (snapshot.val()) {
+    //     this.setState({
+    //       items: snapshot.val()
+    //     })
+    //   } else {
+    //     this.setState({ items: {} })
+    //   }
+    // })
+  }
 
-    firebase.database().ref('foods').on('value', snapshot => {
+  componentDidMount () {
+    const fRoot = firebase.database().ref('foods')
+    fRoot.on('value', snapshot => {
       // console.log(snapshot.val())
       if (snapshot.val()) {
         this.setState({
@@ -47,51 +58,46 @@ class App extends Component {
   }
 
   addItem = (index, event) => {
-    let newState = Object.assign({}, this.state.items)
-    let inx = index
-    newState[inx].quantity = newState[inx].quantity + 1
-    this.setState({ items: newState})
-    firebase.database().ref().update({
-      foods: this.state.items
+    const fRoot = firebase.database().ref('foods')
+
+    fRoot.once('value', snapshot => {
+      let item = snapshot.val()
+      var keys = Object.keys(item)
+      fRoot.child(keys[index]).update({
+        quantity: item[keys[index]].quantity + 1
+      })
     })
   }
 
   removeItem = (index, event) => {
-    let newState = Object.assign({}, this.state.items)
-    let inx = index
-    console.log(newState[1])
-    console.log(newState[inx])
-    if (newState[inx].quantity === 1) {
-      delete(this.state.items[inx])
-      firebase.database().ref().update({
-        foods: this.state.items
-      })
-    } else if (newState[inx].quantity >= 1){
-      newState[inx].quantity = newState[inx].quantity - 1
-      this.setState({ items: newState })
-      firebase.database().ref().update({
-        foods: this.state.items
-      })
-    }
+    const fRoot = firebase.database().ref('foods')
+    fRoot.once('value', snapshot => {
+      let item = snapshot.val()
+      var keys = Object.keys(item)
+      console.log(keys[index])
+      if (item[keys[index]].quantity === 1) {
+        fRoot.child(keys[index]).remove()
+      } else {
+        fRoot.child(keys[index]).update({
+          quantity: (item[keys[index]].quantity - 1)
+        })
+      }
+
+    })
   }
 
   handleSubmit() {
-    if (Object.keys(this.state.items).length === 0) {
-      this.setState({items : [{name: this.state.foodName, quantity: 1 }] })
-      firebase.database().ref().update({
-        foods: this.state.items
-      })
-    } else {
-      this.state.items.push({name: this.state.foodName, quantity: 1 })
-      firebase.database().ref().update({
-        foods: this.state.items
-      })
-    }
+    const fRoot = firebase.database().ref('foods')
+    fRoot.push({
+      name: this.state.foodName,
+      quantity: 1
+    })
     var name = document.getElementById('input-food-name')
     name.value = ''
   }
 
   render() {
+    console.log(this.state.items)
     return (
       <div className="App">
         <header className="title-style">Sangahaan</header>
@@ -150,9 +156,9 @@ class App extends Component {
           </div>
         </section>
 
-        <footer>
+        {/* <footer>
           Created by KITTIST
-        </footer>
+        </footer> */}
       </div>
     );
   }
