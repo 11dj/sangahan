@@ -1,5 +1,7 @@
-import * as firebase from 'firebase'
+// import * as firebase from 'firebase'
 
-export const addFood = (food, name, time) => {
-    firebase.database().ref()
-}
+// var foodRef = firebase.database().ref().child('today').child('foods')
+
+// export const addFood = (food, name) => {
+//     foodRef.
+// }

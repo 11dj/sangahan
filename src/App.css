@@ -1,3 +1,6 @@
+.App {
+  height: 100%;
+}
 @media screen and (min-width: 992px) {
   .App {
     width: 720px;
@@ -64,7 +67,7 @@
   width: 100%;
 }
 
-.button-style {
+.order-btn-style {
   background: #37966F;
   border: none;
   font-size: 22px;
@@ -79,17 +82,37 @@
 .row-list {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 10px 0px;
   background: #B9E4C9;
   padding-left: 4px;
   padding: 10px;
+  text-align: middle;
 }
 
 .list-btn-div {
   display: flex;
-  background: red;
+  /* background: white; */
   justify-content: center;
   margin: 10px 0px;
+  align-items: center;
+}
+.list-btn-flex {
+  flex: 1;
+}
+.list-num-item {
+  padding: 2px 8px;
+  background: #FFFBE6;
+  color: #37966F;
+}
+
+.list-btn-style {
+  background: #37966F;
+  border: none;
+  font-size: 18px;
+  /* padding: 12px; */
+  padding: 2px 8px;
+  color: white;
 }
 
 .list-detail {
@@ -100,41 +123,13 @@
   background-color: #37966F;
 }
 
-.copy-btn {
-  /* background: #37966F; */
-  border: none;
-  /* color: white; */
-  padding: 0px 8px;
-}
-
 footer {
+  position: relative;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   background: #B9E4C9;
   padding: 10px 10px;
   color: #37966F;
   text-align: center;
-}
-
-.list-detail2 {
-  width: 200px;
-  font-size: 16px;
-  margin-left: 20px;
-  /* color: gray; */
-  background-color: #37966F;
-  display: flex;
-}
-
-.list-title-div {
-  flex: 2;
-  background: yellow;
-  /* padding: 2px 4px; */
-  margin: 4px;
-}
-
-.list-name-div {
-  flex: 4;
-  padding: 2px 4px;
-  margin: 4px 4px;
-  /* width: 100%; */
-  background: cyan;
-  justify-content: space-between;
 }

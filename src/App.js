@@ -1,25 +1,40 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import './App.css';
-import copyImg from './img/copy.png'
-import clearImg from './img/clear.png'
-import * as moment from 'moment';
-import { addFood } from './actions/firebase'
+// import copyImg from './img/copy.png'
+// import clearImg from './img/clear.png'
+// import * as moment from 'moment'
+// import { addFood } from './actions/firebase'
+import * as firebase from 'firebase'
+// import firebase from 'firebase/app';
+// import 'firebase/database'
 
 class App extends Component {
   constructor (props) {
     super(props)
     this.state = {
       foodName: '',
-      byName: ''
+      byName: '',
+      test1 : [],
+      test2: '',
+      items: {},
     }
   }
 
-  componentDidUpdate () {
-    console.log(this.state.byName)
+  componentDidMount () {
+
+    firebase.database().ref('foods').on('value', snapshot => {
+      // console.log(snapshot.val())
+      if (snapshot.val()) {
+        this.setState({
+          items: snapshot.val()
+        })
+      } else {
+        this.setState({ items: {} })
+      }
+    })
   }
 
   handleInputChange = (type, event) => {
-    // console.log(event.target.value)
     if (type === 'food') {
       this.setState({
         foodName: event.target.value
@@ -31,17 +46,55 @@ class App extends Component {
     }
   }
 
-  handleSubmit() {
+  addItem = (index, event) => {
+    let newState = Object.assign({}, this.state.items)
+    let inx = index
+    newState[inx].quantity = newState[inx].quantity + 1
+    this.setState({ items: newState})
+    firebase.database().ref().update({
+      foods: this.state.items
+    })
+  }
 
-    
+  removeItem = (index, event) => {
+    let newState = Object.assign({}, this.state.items)
+    let inx = index
+    console.log(newState[1])
+    console.log(newState[inx])
+    if (newState[inx].quantity === 1) {
+      delete(this.state.items[inx])
+      firebase.database().ref().update({
+        foods: this.state.items
+      })
+    } else if (newState[inx].quantity >= 1){
+      newState[inx].quantity = newState[inx].quantity - 1
+      this.setState({ items: newState })
+      firebase.database().ref().update({
+        foods: this.state.items
+      })
+    }
+  }
+
+  handleSubmit() {
+    if (Object.keys(this.state.items).length === 0) {
+      this.setState({items : [{name: this.state.foodName, quantity: 1 }] })
+      firebase.database().ref().update({
+        foods: this.state.items
+      })
+    } else {
+      this.state.items.push({name: this.state.foodName, quantity: 1 })
+      firebase.database().ref().update({
+        foods: this.state.items
+      })
+    }
+    var name = document.getElementById('input-food-name')
+    name.value = ''
   }
 
   render() {
     return (
       <div className="App">
         <header className="title-style">Sangahaan</header>
-
-        {/* หน้าสั่งอาหาร */}
         <section>
           <div className="section1">
             <div className='header1'>สั่งอาหารของคุณ</div>
@@ -52,80 +105,46 @@ class App extends Component {
                 className='menu-name-input'
                 name="name"
                 placeholder='ชื่ออาหารที่จะสั่ง'
+                id='input-food-name'
                 onChange={this.handleInputChange.bind(this, 'food')}
               />
             </div>
-            <div className='input-div'>
-              <input 
-                type="text" 
-                className='menu-name-input' 
-                name="name" 
-                placeholder='ชื่อคนสั่ง' 
-                onChange={this.handleInputChange.bind(this, 'name')}
-              />
-            </div>
             <div className="button-div">
-              <button className='button-style'>
+              <button 
+              className='order-btn-style'
+              onClick={() => this.handleSubmit()}>
                 สั่งเลย
               </button>
             </div>
           </div>
         </section>
 
-        {/* หน้ารายการสั่งอาหาร */}
+
         <section>
           <div className="section1">
             <div className='header1'>รายการที่สั่ง</div>
             <div className="h-line"></div>
             <div className='list-div'>
 
-              {/* ข้อ 1  */}
-              <div className='row-list'>
-                <div>
-                  <div>1.ข้าวกระเพราหมูกรอบไข่ดาว</div>
-                  {/* <div className='list-detail'>2 ea | ของ แดง</div> */}
-                </div>
-                <div className='list-btn-div'>
-                2
-                </div>
-              </div>
-
-              {/* ข้อ 2  */}
-              {/* <div className='row-list'>
-                <div>
-                  <div>2.ก๋วยเตี๋ยวผัดซีอิ๊ว</div>
-                  <div className='list-detail'>2 ea | ของ ไมค์,ใหม่,ปอ</div>
-                </div>
-                <div className='list-btn-div'>
-                  <button className='copy-btn' >
-                    <img src={copyImg} style={{width: '20px'}} />
-                  </button>
-                  <div className="v-line"></div>
-                  <button className='copy-btn' >
-                    <img src={clearImg} style={{width: '14px'}} />
-                  </button>
-                </div>
-              </div> */}
-
-              {/* ข้อ 3  */}
-              {/* <div className='row-list'>
-                <div>
-                  <div>3.ก๋วยเตี๋ยวผัดซีอิ๊ว x 1 ชุด</div>
-                  <div className='list-detail2'>
-                    <div className='list-title-div'>
-                      สั่งโดย
-                    </div>
-                    <div className='list-name-div'>
+              {
+                /* items.map */
+                Object.keys(this.state.items).map((key, index) => 
+                <div key={index} className='row-list'>
                       <div>
-                        <div>1. แดง</div>
-                        <div>ลบ</div>
+                        <div>{(index + 1) +'.' + this.state.items[key].name}</div>
                       </div>
-                      <div>2. ไมค์</div>
-                      <div>3. เหลือง</div>
+                      <div className='list-btn-div'>
+                        <div className='list-btn-flex'>
+                          <button className='list-btn-style' onClick={this.addItem.bind(this, index)}>+</button>
+                        </div>
+                        <div className='list-btn-flex list-num-item'>{this.state.items[key].quantity}</div>
+                        <div className='list-btn-flex'>
+                          <button className='list-btn-style' onClick={this.removeItem.bind(this, index)}>-</button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div> */}
+              )
+              }
 
             </div>
           </div>
