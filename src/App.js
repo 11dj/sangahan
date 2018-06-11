@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import './App.css';
 // import copyImg from './img/copy.png'
 // import clearImg from './img/clear.png'
-// import * as moment from 'moment'
+import binImg from './img/bin.svg'
+import * as moment from 'moment'
 // import { addFood } from './actions/firebase'
 import * as firebase from 'firebase'
 // import firebase from 'firebase/app';
@@ -13,8 +14,10 @@ class App extends Component {
     super(props)
     this.state = {
       foodName: '',
-      byName: '',
-      items: {}
+      byName: [],
+      items: {},
+      time: '',
+      wholist:[]
     }
   }
 
@@ -29,6 +32,14 @@ class App extends Component {
     //     this.setState({ items: {} })
     //   }
     // })
+  }
+
+  componentWillMount () {
+    moment.locale()
+    let time = moment().format('D MMMM YYYY')
+    this.setState({
+      time: time
+    })
   }
 
   componentDidMount () {
@@ -69,35 +80,49 @@ class App extends Component {
     })
   }
 
-  removeItem = (index, event) => {
-    const fRoot = firebase.database().ref('foods')
+  removeItem = (index, key) => {
+    const fRoot = firebase.database().ref('foods/' + key)
     fRoot.once('value', snapshot => {
-      let item = snapshot.val()
-      var keys = Object.keys(item)
-      console.log(keys[index])
-      if (item[keys[index]].quantity === 1) {
-        fRoot.child(keys[index]).remove()
+      let list = snapshot.val().who
+      if (list.length === 1) {
+        fRoot.remove()
       } else {
-        fRoot.child(keys[index]).update({
-          quantity: (item[keys[index]].quantity - 1)
+        list.splice(index, 1)
+        fRoot.update({
+          who: list
         })
       }
-
     })
   }
 
-  handleSubmit() {
+  handleSubmit = (type, key) => {
     const fRoot = firebase.database().ref('foods')
-    fRoot.push({
-      name: this.state.foodName,
-      quantity: 1
-    })
-    var name = document.getElementById('input-food-name')
-    name.value = ''
+    if (type === 'add') {
+      fRoot.child(key).once('value', snapshot => {
+        fRoot.child(key).update({
+          quantity: snapshot.val().quantity + 1,
+          who: snapshot.val().who.concat([this.state.byName])
+        })
+      })
+      var name3 = document.getElementById(key)
+      name3.value = ''
+    } else {
+      fRoot.push({
+        name: this.state.foodName,
+        quantity: 1,
+        who: [this.state.byName]
+      })
+      var name1 = document.getElementById('input-food-name')
+      var name2 = document.getElementById('input-food')
+      console.log(key)
+      name1.value = ''
+      name2.value = ''
+    }
   }
 
   render() {
-    console.log(this.state.items)
+    // console.log(this.state.items)
+    let foodlist = this.state.items
     return (
       <div className="App">
         <header className="title-style">Sangahaan</header>
@@ -115,6 +140,16 @@ class App extends Component {
                 onChange={this.handleInputChange.bind(this, 'food')}
               />
             </div>
+            <div className='input-div'>
+              <input 
+                type="text"
+                className='menu-name-input'
+                name="name"
+                placeholder='ใครสั่ง'
+                id='input-food'
+                onChange={this.handleInputChange.bind(this, 'name')}
+              />
+            </div>
             <div className="button-div">
               <button 
               className='order-btn-style'
@@ -128,27 +163,45 @@ class App extends Component {
 
         <section>
           <div className="section1">
-            <div className='header1'>รายการที่สั่ง</div>
+            <div className='header2'>
+              <div>รายการที่สั่ง</div>
+              <div>{this.state.time}</div>
+            </div>
             <div className="h-line"></div>
             <div className='list-div'>
-
               {
                 /* items.map */
-                Object.keys(this.state.items).map((key, index) => 
+                Object.keys(foodlist || []).map((key, index) => 
                 <div key={index} className='row-list'>
-                      <div>
-                        <div>{(index + 1) +'.' + this.state.items[key].name}</div>
+                  <div className="row-list-div" >
+                    <div>
+                      <div>{(index + 1) +'.' + foodlist[key].name + ' - ' + (foodlist[key].who.length || '')  + ' ชุด'}</div>
+                    </div>
+                    
+                    <div className='who-order-div'>
+
+                      <div>คนสั่ง :</div>
+
+                      <div style={{marginLeft:'5px'}}>
+                        {foodlist[key].who.map((list, index) =>
+                          <div key={index} className='who-order-div-sub'>
+                            <div>{(index + 1) + '.' + list}</div>
+                            <div>
+                              <button className="who-order-det-but " onClick={() => this.removeItem(index, key)}>
+                                <img src={binImg} width={15} alt="logo" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className='list-btn-div'>
-                        <div className='list-btn-flex'>
-                          <button className='list-btn-style' onClick={this.addItem.bind(this, index)}>+</button>
-                        </div>
-                        <div className='list-btn-flex list-num-item'>{this.state.items[key].quantity}</div>
-                        <div className='list-btn-flex'>
-                          <button className='list-btn-style' onClick={this.removeItem.bind(this, index)}>-</button>
-                        </div>
+
+                      <div>
+                        <input type="text" name="name" id={key} className="input-add-name" placeholder="ชื่อ" onChange={this.handleInputChange.bind(this, 'name')}/>
+                        <button className="btn-add" onClick={() => this.handleSubmit('add', key)}>สั่งด้วย</button>
                       </div>
                     </div>
+                  </div>
+                </div>
               )
               }
 

@@ -32,6 +32,15 @@
 .header1 {
   margin-bottom: 10px;
   text-align: center;
+  margin: 0px 20px;
+}
+
+.header2 {
+  margin-bottom: 10px;
+  text-align: center;
+  margin: 0px 20px;
+  display: flex;
+  justify-content: space-between;
 }
 .h-line {
   border-bottom: 1px red solid;
@@ -82,7 +91,7 @@
 .row-list {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  /* align-items: center; */
   margin: 10px 0px;
   background: #B9E4C9;
   padding-left: 4px;
@@ -90,8 +99,14 @@
   text-align: middle;
 }
 
-.list-btn-div {
+.row-list-div {
   display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.list-btn-div {
+  /* display: flex; */
   /* background: white; */
   justify-content: center;
   margin: 10px 0px;
@@ -121,6 +136,49 @@
   margin-left: 20px;
   /* color: gray; */
   background-color: #37966F;
+}
+
+.who-order-div {
+  text-align: right;
+  /* display: flex; */
+  /* margin-top: 10px; */
+  /* margin-left: 5%; */
+}
+
+.who-order-det-but {
+  background-color: transparent;
+  border: none;
+}
+
+.who-order-div-sub {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.input-add-name {
+  background: transparent;
+  border: none;
+  background-color: #FFFBE6;
+  padding: 4px;
+  color: #37966F;
+  width: 30%;
+  margin-right: 4px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+.input-add-name::placeholder {
+  color: #B9E4C9;
+}
+
+.btn-add {
+  background: #37966F;
+  border: none;
+  /* font-size: 22px; */
+  padding: 4px 8px;
+  color: white;
 }
 
 footer {
