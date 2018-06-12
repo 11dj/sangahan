@@ -9,11 +9,16 @@ class App extends Component {
     super(props)
     this.state = {
       foodName: '',
-      byName: [],
+      nameList: [],
       items: {},
       time: '',
-      wholist:[]
+      wholist:[],
+      byname:''
     }
+    this.handleInputChange = this.handleInputChange.bind(this)
+    this.addItem = this.addItem.bind(this)
+    this.removeItem = this.removeItem.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
   componentWillMount () {
@@ -37,19 +42,19 @@ class App extends Component {
     })
   }
 
-  handleInputChange = (type, event) => {
+  handleInputChange (type, event) {
     if (type === 'food') {
       this.setState({
         foodName: event.target.value
       })
     } else if (type === 'name') {
       this.setState({
-        byName: event.target.value
+        byname: event.target.value
       })
     }
   }
 
-  addItem = (index, event) => {
+  addItem (index, event) {
     const fRoot = firebase.database().ref('foods')
 
     fRoot.once('value', snapshot => {
@@ -61,7 +66,7 @@ class App extends Component {
     })
   }
 
-  removeItem = (index, key) => {
+  removeItem (index, key) {
     const fRoot = firebase.database().ref('foods/' + key)
     fRoot.once('value', snapshot => {
       let list = snapshot.val().who
@@ -76,25 +81,34 @@ class App extends Component {
     })
   }
 
-  handleSubmit = (type, key) => {
+  handleSubmit (type, key) {
     const fRoot = firebase.database().ref('foods')
     if (type === 'add') {
       fRoot.child(key).once('value', snapshot => {
         fRoot.child(key).update({
           quantity: snapshot.val().quantity + 1,
-          who: snapshot.val().who.concat([this.state.byName])
+          who: snapshot.val().who.concat([this.state.byname])
         })
       })
       var name3 = document.getElementById(key)
       name3.value = ''
     } else {
-      fRoot.push({
-        name: this.state.foodName,
-        quantity: 1,
-        who: [this.state.byName]
-      })
-      document.getElementById('input-food-name').value = ''
-      document.getElementById('input-food').value = ''
+      console.log(this.state.byname)
+      if (this.state.byname === '') {
+        alert('กรุณาใส่ชื่อด้วย')
+      } else {
+        fRoot.push({
+          name: this.state.foodName,
+          quantity: 1,
+          who: [this.state.byname]
+        })
+        document.getElementById('input-food-name').value = ''
+        document.getElementById('input-food').value = ''
+        this.setState({
+          foodName: '', 
+          byname : ''
+        })
+      }
     }
   }
 
