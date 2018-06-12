@@ -1,13 +1,8 @@
 import React, { Component } from 'react'
 import './App.css';
-// import copyImg from './img/copy.png'
-// import clearImg from './img/clear.png'
 import binImg from './img/bin.svg'
 import * as moment from 'moment'
-// import { addFood } from './actions/firebase'
 import * as firebase from 'firebase'
-// import firebase from 'firebase/app';
-// import 'firebase/database'
 
 class App extends Component {
   constructor (props) {
@@ -21,19 +16,6 @@ class App extends Component {
     }
   }
 
-  componentDidUpdate () {
-    // firebase.database().ref('foods').on('value', snapshot => {
-    //   // console.log(snapshot.val())
-    //   if (snapshot.val()) {
-    //     this.setState({
-    //       items: snapshot.val()
-    //     })
-    //   } else {
-    //     this.setState({ items: {} })
-    //   }
-    // })
-  }
-
   componentWillMount () {
     moment.locale()
     let time = moment().format('D MMMM YYYY')
@@ -45,7 +27,6 @@ class App extends Component {
   componentDidMount () {
     const fRoot = firebase.database().ref('foods')
     fRoot.on('value', snapshot => {
-      // console.log(snapshot.val())
       if (snapshot.val()) {
         this.setState({
           items: snapshot.val()
@@ -112,16 +93,12 @@ class App extends Component {
         quantity: 1,
         who: [this.state.byName]
       })
-      var name1 = document.getElementById('input-food-name')
-      var name2 = document.getElementById('input-food')
-      console.log(key)
-      name1.value = ''
-      name2.value = ''
+      document.getElementById('input-food-name').value = ''
+      document.getElementById('input-food').value = ''
     }
   }
 
   render() {
-    // console.log(this.state.items)
     let foodlist = this.state.items
     return (
       <div className="App">
@@ -137,6 +114,7 @@ class App extends Component {
                 name="name"
                 placeholder='ชื่ออาหารที่จะสั่ง'
                 id='input-food-name'
+                autoComplete='off'
                 onChange={this.handleInputChange.bind(this, 'food')}
               />
             </div>
@@ -147,6 +125,7 @@ class App extends Component {
                 name="name"
                 placeholder='ใครสั่ง'
                 id='input-food'
+                autoComplete='off'
                 onChange={this.handleInputChange.bind(this, 'name')}
               />
             </div>
@@ -175,7 +154,7 @@ class App extends Component {
                 <div key={index} className='row-list'>
                   <div className="row-list-div" >
                     <div>
-                      <div>{(index + 1) +'.' + foodlist[key].name + ' - ' + (foodlist[key].who.length || '')  + ' ชุด'}</div>
+                      <div>{(index + 1) +'.' + foodlist[key].name + ' - ' + (foodlist[key].who.length)  + ' ชุด'}</div>
                     </div>
                     
                     <div className='who-order-div'>
@@ -183,11 +162,14 @@ class App extends Component {
                       <div>คนสั่ง :</div>
 
                       <div style={{marginLeft:'5px'}}>
-                        {foodlist[key].who.map((list, index) =>
+                        {(foodlist[key].who || []).map((list, index) =>
                           <div key={index} className='who-order-div-sub'>
                             <div>{(index + 1) + '.' + list}</div>
                             <div>
-                              <button className="who-order-det-but " onClick={() => this.removeItem(index, key)}>
+                              <button 
+                                className="who-order-det-but " 
+                                onClick={() => this.removeItem(index, key)}
+                                autoComplete='off'>
                                 <img src={binImg} width={15} alt="logo" />
                               </button>
                             </div>
