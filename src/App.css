@@ -1,6 +1,8 @@
 .App {
   height: 100%;
 }
+
+/* Desktop screen */
 @media screen and (min-width: 720px) {
   .App {
     width: 720px;
@@ -8,10 +10,18 @@
   }
 }
 
+/* Mobile Screen */
 @media screen and (max-width: 720px) {
   .App {
     width: 100%;
   }
+}
+
+.hide {
+  display: none;
+}
+.show {
+  display: block;
 }
 
 .title-style {
@@ -20,6 +30,17 @@
   margin: 20px;
   /* background-color: #B9E4C9; */
   padding: 20px 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.title-header {
+  margin-right: 10px
+}
+
+.title-version {
+  font-size: 16px;
+  align-items: flex-end;
 }
 
 .section1 {
@@ -27,6 +48,28 @@
   margin: 20px;
   background-color: #EEF3D7;
   padding: 20px 0px;
+  /* text-align: center; */
+}
+.nav {
+  margin: 0px 10px;
+  cursor: pointer;
+}
+.nav-b {
+  font-weight: bold;
+}
+
+.nav-v-line {
+  border-left: 2px solid black;
+}
+
+.sectionNav {
+  font-size: 24px;
+  margin: 20px;
+  /* background-color: #EEF3D7; */
+  padding: 20px 0px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .header1 {
@@ -83,6 +126,12 @@
   padding: 8px 16px;
   color: white;
 }
+.clear-btn-style {
+  background: #37966F;
+  border: none;
+  font-size: 22px;
+  color: white;
+}
 
 .list-div {
   font-size: 18px;
@@ -103,6 +152,21 @@
   display: flex;
   width: 100%;
   justify-content: space-between;
+}
+
+.sum-list {
+  justify-content: space-between;
+  /* align-items: center; */
+  margin: 10px 0px;
+  background: #B9E4C9;
+  padding-left: 4px;
+  padding: 10px;
+  text-align: middle;
+}
+
+.sum-list-div {
+  width: 100%;
+  text-align: center;
 }
 
 .list-btn-div {

@@ -13,8 +13,7 @@ class App extends Component {
       items: {},
       time: '',
       wholist:[],
-      byname:'',
-      orderCount: 0
+      byname:''
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.addItem = this.addItem.bind(this)
@@ -43,16 +42,6 @@ class App extends Component {
       } else {
         this.setState({ items: {} })
       }
-      console.log(snapshot.val())
-      Object.keys(snapshot.val()).map(((value) => {
-        console.log(value)
-        fRoot.child(value).on('value', snap2 => {
-          console.log(snap2.val().quantity)
-          this.setState({
-            orderCount:this.state.orderCount + snap2.val().quantity
-          })
-        })
-      }))
     })
   }
 
@@ -65,38 +54,6 @@ class App extends Component {
       this.setState({
         byname: event.target.value
       })
-    }
-  }
-
-  handleNav (event) {
-    let homeT = document.getElementById('home-page-tab')
-    let menuT = document.getElementById('menu-page-tab')
-    let histT = document.getElementById('history-page-tab')
-    let home = document.getElementById('home-page')
-    let menu = document.getElementById('menu-page')
-    let hist = document.getElementById('history-page')
-    console.log(event.target.id)
-    if (event.target.id === 'home-page-tab') {
-      homeT.className = 'nav nav-b'
-      menuT.className = 'nav'
-      histT.className = 'nav'
-      home.style.display = 'block'
-      menu.style.display = 'none'
-      hist.style.display = 'none'
-    } else if (event.target.id === 'menu-page-tab') {
-      homeT.className = 'nav'
-      menuT.className = 'nav nav-b'
-      histT.className = 'nav'
-      home.style.display = 'none'
-      menu.style.display = 'block'
-      hist.style.display = 'none'
-    } else if (event.target.id === 'history-page-tab') {
-      homeT.className = 'nav'
-      menuT.className = 'nav'
-      histT.className = 'nav nav-b'
-      home.style.display = 'none'
-      menu.style.display = 'none'
-      hist.style.display = 'block'
     }
   }
 
@@ -170,26 +127,14 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.state.orderCount)
     let foodlist = this.state.items
     return (
       <div className="App">
-        <header className="title-style">
-          <div className='title-header'>สั่งข้าว</div>
-          <div className='title-version'>v1.3.0</div>
-        </header>
+        <header className="title-style">Sangkao 1.1.1</header>
         <section>
-          <div className="sectionNav">
-            <a className='nav nav-b' id='home-page-tab' onClick={this.handleNav.bind(this)}>หน้าแรก</a>
-            <div className='nav-v-line'></div>
-            <a className='nav' id='menu-page-tab' onClick={this.handleNav.bind(this)}>เมนูอาหาร</a>
-            <div className='nav-v-line'></div>
-            <a className='nav' id='history-page-tab' onClick={this.handleNav.bind(this)}>ประวัติการสั่ง</a>
-          </div>
+          Hello
         </section>
-
-        <section id='home-page'>
-          {/* ส่วนหน้าสั่งอาหาร */}
+        <section>
           <div className="section1">
             <div className='header1'>สั่งอาหารของคุณ</div>
             <div className="h-line"></div>
@@ -224,16 +169,18 @@ class App extends Component {
               </button>
             </div>
           </div>
+        </section>
 
-          {/* ส่วนรายชื่ออาหารและคนสั่ง */}
+
+        <section>
           <div className="section1">
             <div className='header2'>
               <div>รายการที่สั่ง</div>
               <div style={{display:'flex'}}>
                   <div>
-                    <button onClick={() => this.clear()} className='clear-btn-style' style={{display:'block'}}>clear</button>
+                    <button onClick={() => this.clear()} style={{display:'block'}}>clear</button>
                   </div>
-                  {/* <div>{this.state.time}</div> */}
+                  <div>{this.state.time}</div>
               
               </div>
             </div>
@@ -258,7 +205,7 @@ class App extends Component {
                             <div>{(index + 1) + '.' + list}</div>
                             <div>
                               <button 
-                                className="who-order-det-but" 
+                                className="who-order-det-but " 
                                 onClick={() => this.removeItem(index, key)}
                                 autoComplete='off'>
                                 <img src={binImg} width={15} alt="logo" />
@@ -278,27 +225,8 @@ class App extends Component {
               )
               }
 
-              <div className={`sum-list ${ this.state.orderCount > 0 ? 'show' : 'hide' }`}>
-                <div className={`sum-list-div`} >
-                  รวมทั้งหมด {this.state.orderCount} ชุด
-                </div>
-              </div>
-              <div className={`sum-list ${ this.state.orderCount > 0 ? 'hide' : 'show' }`}>
-                <div className={`sum-list-div`} >
-                  ยังไม่มีใครสั่งเลยครับ
-                </div>
-              </div>
-
-
             </div>
           </div>
-        </section>
-        <section id='menu-page' style={{display:'none'}}>
-        <img src="https://img.wongnai.com/p/1968x0/2017/08/06/87bf93c66ce04e079f66f441c3368aa7.jpg" alt="" style={{width:'100%'}}/>
-        </section>
-
-        <section id="history-page" style={{display:'none'}}>
-        under construction
         </section>
 
         {/* <footer>
