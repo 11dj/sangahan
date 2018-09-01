@@ -44,16 +44,21 @@ class App extends Component {
         this.setState({ items: {} })
       }
       console.log(snapshot.val())
+      let total = 0
       Object.keys(snapshot.val()).map(((value) => {
-        console.log(value)
         fRoot.child(value).on('value', snap2 => {
-          console.log(snap2.val().quantity)
-          this.setState({
-            orderCount:this.state.orderCount + snap2.val().quantity
-          })
+          console.log(value, snap2.val().quantity)
+          total = total + snap2.val().quantity
+        })
+        this.setState({
+          orderCount: total
         })
       }))
     })
+  }
+
+  componentDidUpdate () {
+
   }
 
   handleInputChange (type, event) {
@@ -116,14 +121,19 @@ class App extends Component {
     const fRoot = firebase.database().ref('foods/' + key)
     fRoot.once('value', snapshot => {
       let list = snapshot.val().who
+      let quantity = snapshot.val().quantity
       if (list.length === 1) {
         fRoot.remove()
       } else {
         list.splice(index, 1)
         fRoot.update({
-          who: list
+          who: list,
+          quantity: quantity - 1
         })
       }
+    })
+    this.setState({
+      orderCount: this.state.orderCount - 1 
     })
   }
 
@@ -170,13 +180,13 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.state.orderCount)
+    console.log('Total : ', this.state.orderCount)
     let foodlist = this.state.items
     return (
       <div className="App">
         <header className="title-style">
           <div className='title-header'>สั่งข้าว</div>
-          <div className='title-version'>v1.3.0</div>
+          <div className='title-version'>v1.3.2</div>
         </header>
         <section>
           <div className="sectionNav">
@@ -228,7 +238,10 @@ class App extends Component {
           {/* ส่วนรายชื่ออาหารและคนสั่ง */}
           <div className="section1">
             <div className='header2'>
-              <div>รายการที่สั่ง</div>
+              <div>
+                รายการที่สั่ง 
+                <span > ตัดยอดที่เวลา </span>
+              </div>
               <div style={{display:'flex'}}>
                   <div>
                     <button onClick={() => this.clear()} className='clear-btn-style' style={{display:'block'}}>clear</button>
