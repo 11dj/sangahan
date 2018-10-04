@@ -25,17 +25,18 @@ class App extends Component {
 
   componentWillMount () {
     moment.locale()
-    let time = moment().format('D MMMM YYYY')
+    let currentTime = moment().format('DMMYYYY')
     console.log(moment().format('DMMYYYY'))
-    // console.log(new Date())
     this.setState({
-      time: time
+      time: currentTime
     })
   }
 
   componentDidMount () {
-    const fRoot = firebase.database().ref('foods')
+    // this.autoClear()
+    const fRoot = firebase.database().ref('current').child('foods')
     fRoot.on('value', snapshot => {
+      console.log('Hello', snapshot.val())
       if (snapshot.val()) {
         this.setState({
           items: snapshot.val()
@@ -43,22 +44,47 @@ class App extends Component {
       } else {
         this.setState({ items: {} })
       }
-      console.log(snapshot.val())
-      let total = 0
-      Object.keys(snapshot.val()).map(((value) => {
-        fRoot.child(value).on('value', snap2 => {
-          console.log(value, snap2.val().quantity)
-          total = total + snap2.val().quantity
-        })
-        this.setState({
-          orderCount: total
-        })
-      }))
+      if (snapshot.val()) {
+        Object.keys(snapshot.val()).map(((value) => {
+          let total = 0
+          console.log(value)
+          fRoot.child(value).once('value', snap2 => {
+            total = total + snap2.val().quantity
+          })
+          this.setState({
+            orderCount: total
+          })
+        }))
+      }
     })
   }
 
   componentDidUpdate () {
 
+  }
+
+  autoClear = () => {
+    const fRoot = firebase.database()
+    fRoot.ref('current').once('value', snapshot => {
+      if (snapshot.val()) {
+        console.log('date', snapshot.val())
+        if (!snapshot.val().date) {
+          if (snapshot.val().date !== this.state.time) {
+            fRoot.ref('histories').update({
+              [snapshot.val().date]: snapshot.val()
+            })
+            fRoot.ref('current').remove()
+          }
+        }
+      }
+    })
+    let time = moment().format('DMMYYYY')
+    fRoot.ref('foods').once('value', snapshot => {
+      fRoot.ref('histories').update({
+        [time]: snapshot.val()
+      })
+    })
+    fRoot.ref('foods').remove()
   }
 
   handleInputChange (type, event) {
@@ -106,7 +132,7 @@ class App extends Component {
   }
 
   addItem (index, event) {
-    const fRoot = firebase.database().ref('foods')
+    const fRoot = firebase.database().ref('current').child('foods')
 
     fRoot.once('value', snapshot => {
       let item = snapshot.val()
@@ -118,15 +144,15 @@ class App extends Component {
   }
 
   removeItem (index, key) {
-    const fRoot = firebase.database().ref('foods/' + key)
-    fRoot.once('value', snapshot => {
+    const fRoot = firebase.database().ref('current')
+    fRoot.child('foods/' + key).once('value', snapshot => {
       let list = snapshot.val().who
       let quantity = snapshot.val().quantity
       if (list.length === 1) {
         fRoot.remove()
       } else {
         list.splice(index, 1)
-        fRoot.update({
+        fRoot.child('foods/' + key).update({
           who: list,
           quantity: quantity - 1
         })
@@ -138,10 +164,10 @@ class App extends Component {
   }
 
   handleSubmit (type, key) {
-    const fRoot = firebase.database().ref('foods')
+    const fRoot = firebase.database().ref('current')
     if (type === 'add') {
-      fRoot.child(key).once('value', snapshot => {
-        fRoot.child(key).update({
+      fRoot.child('foods').child(key).once('value', snapshot => {
+        fRoot.child('foods').child(key).update({
           quantity: snapshot.val().quantity + 1,
           who: snapshot.val().who.concat([this.state.byname])
         })
@@ -153,7 +179,12 @@ class App extends Component {
       if (this.state.byname === '') {
         alert('กรุณาใส่ชื่อด้วย')
       } else {
-        fRoot.push({
+        fRoot.once('value', snapshot => {
+          if (!snapshot.val().date) {
+            fRoot.update({ date: this.state.time })
+          } 
+        })
+        fRoot.child('foods').push({
           name: this.state.foodName,
           quantity: 1,
           who: [this.state.byname]
@@ -169,14 +200,14 @@ class App extends Component {
   }
 
   clear () {
-    const fRoot = firebase.database()
+    const fRoot = firebase.database().ref('current')
     let time = moment().format('DMMYYYY')
-    fRoot.ref('foods').once('value', snapshot => {
-      fRoot.ref('histories').update({
+    fRoot.child('foods').once('value', snapshot => {
+      fRoot.child('histories').update({
         [time]: snapshot.val()
       })
     })
-    fRoot.ref('foods').remove()
+    fRoot.remove()
   }
 
   render() {
@@ -185,30 +216,30 @@ class App extends Component {
     return (
       <div className="App">
         <header className="title-style">
-          <div className='title-header'>สั่งข้าว</div>
-          <div className='title-version'>v1.3.2</div>
+          <div className='title-header'>Sangkao</div>
+          <div className='title-version'>v1.3.7</div>
         </header>
         <section>
           <div className="sectionNav">
-            <a className='nav nav-b' id='home-page-tab' onClick={this.handleNav.bind(this)}>หน้าแรก</a>
+            <a className='nav nav-b' id='home-page-tab' onClick={this.handleNav.bind(this)}>Home</a>
             <div className='nav-v-line'></div>
-            <a className='nav' id='menu-page-tab' onClick={this.handleNav.bind(this)}>เมนูอาหาร</a>
+            <a className='nav' id='menu-page-tab' onClick={this.handleNav.bind(this)}>Food menu</a>
             <div className='nav-v-line'></div>
-            <a className='nav' id='history-page-tab' onClick={this.handleNav.bind(this)}>ประวัติการสั่ง</a>
+            <a className='nav' id='history-page-tab' onClick={this.handleNav.bind(this)}>History</a>
           </div>
         </section>
 
         <section id='home-page'>
           {/* ส่วนหน้าสั่งอาหาร */}
           <div className="section1">
-            <div className='header1'>สั่งอาหารของคุณ</div>
+            <div className='header1'>Your order</div>
             <div className="h-line"></div>
             <div className='input-div'>
               <input 
                 type="text"
                 className='menu-name-input'
                 name="foodname"
-                placeholder='ชื่ออาหารที่จะสั่ง'
+                placeholder='Food name'
                 id='input-food-name'
                 autoComplete='off'
                 onChange={this.handleInputChange.bind(this, 'food')}
@@ -219,7 +250,7 @@ class App extends Component {
                 type="text"
                 className='menu-name-input'
                 name="byname"
-                placeholder='ใครสั่ง'
+                placeholder="Your name"
                 id='input-food'
                 autoComplete='off'
                 onChange={this.handleInputChange.bind(this, 'name')}
@@ -230,7 +261,7 @@ class App extends Component {
               className='order-btn-style'
               id='submit'
               onClick={() => this.handleSubmit()}>
-                สั่งเลย
+                Order now
               </button>
             </div>
           </div>
@@ -239,8 +270,8 @@ class App extends Component {
           <div className="section1">
             <div className='header2'>
               <div>
-                รายการที่สั่ง 
-                <span > ตัดยอดที่เวลา </span>
+                Today's order list :   
+                <span > {moment().format('D MMMM YYYY')} </span>
               </div>
               <div style={{display:'flex'}}>
                   <div>
@@ -258,12 +289,12 @@ class App extends Component {
                 <div key={index} className='row-list'>
                   <div className="row-list-div" >
                     <div>
-                      <div>{(index + 1) +'.' + foodlist[key].name + ' - ' + (foodlist[key].who.length)  + ' ชุด'}</div>
+                      <div>{(index + 1) +'.' + foodlist[key].name + ' - ' + (foodlist[key].who.length)  + ' ea'}</div>
                     </div>
                     
                     <div className='who-order-div'>
 
-                      <div>คนสั่ง :</div>
+                      <div>by :</div>
 
                       <div style={{marginLeft:'5px'}}>
                         {(foodlist[key].who || []).map((list, index) =>
@@ -283,7 +314,7 @@ class App extends Component {
 
                       <div>
                         <input type="text" name="name" id={key} className="input-add-name" placeholder="ชื่อ" onChange={this.handleInputChange.bind(this, 'name')}/>
-                        <button className="btn-add" onClick={() => this.handleSubmit('add', key)}>สั่งด้วย</button>
+                        <button className="btn-add" onClick={() => this.handleSubmit('add', key)}>Get in</button>
                       </div>
                     </div>
                   </div>
@@ -293,12 +324,12 @@ class App extends Component {
 
               <div className={`sum-list ${ this.state.orderCount > 0 ? 'show' : 'hide' }`}>
                 <div className={`sum-list-div`} >
-                  รวมทั้งหมด {this.state.orderCount} ชุด
+                  today {this.state.orderCount} ea
                 </div>
               </div>
               <div className={`sum-list ${ this.state.orderCount > 0 ? 'hide' : 'show' }`}>
                 <div className={`sum-list-div`} >
-                  ยังไม่มีใครสั่งเลยครับ
+                  No order 
                 </div>
               </div>
 
