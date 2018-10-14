@@ -33,7 +33,6 @@ class App extends Component {
   }
 
   componentDidMount () {
-    // this.autoClear()
     const fRoot = firebase.database().ref('current').child('foods')
     fRoot.on('value', snapshot => {
       console.log('Hello', snapshot.val())
@@ -144,12 +143,13 @@ class App extends Component {
   }
 
   removeItem (index, key) {
+    console.log('index', index, 'key', key)
     const fRoot = firebase.database().ref('current')
     fRoot.child('foods/' + key).once('value', snapshot => {
       let list = snapshot.val().who
       let quantity = snapshot.val().quantity
       if (list.length === 1) {
-        fRoot.remove()
+        fRoot.child('foods/' + key).remove()
       } else {
         list.splice(index, 1)
         fRoot.child('foods/' + key).update({
@@ -217,7 +217,7 @@ class App extends Component {
       <div className="App">
         <header className="title-style">
           <div className='title-header'>Sangkao</div>
-          <div className='title-version'>v1.3.7</div>
+          <div className='title-version'>v1.3.9</div>
         </header>
         <section>
           <div className="sectionNav">
